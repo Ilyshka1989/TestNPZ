@@ -1,0 +1,49 @@
+﻿@page
+@model TestNPZ.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Добро пожаловать!</h1>
+    <p>Моё тестовое приложение для выгрузки данных из БеларусБанка</a>.</p>
+</div>
+@if (Model.ExchangeRates != null && Model.ExchangeRates.Any())
+{
+    var firstRow = Model.ExchangeRates.First();
+    <p>
+        @firstRow.name_type @firstRow.name.
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Валюта</th>
+                <th>Покупка</th>
+                <th>Продажа</th>
+                <th>Улица</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rate in Model.ExchangeRates)
+            {
+                <tr>
+                    <td>USD</td>
+                    <td>@rate.USD_in</td>
+                    <td>@rate.USD_out</td>
+                    <td>@rate.street_type @rate.street</td>
+                </tr>
+                <tr>
+                    <td>EUR</td>
+                    <td>@rate.EUR_in</td>
+                    <td>@rate.EUR_out</td>
+                    <td>@rate.street_type @rate.street</td>
+                </tr>
+                <!-- Добавь сюда остальные валюты -->
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Курс валют недоступен.</p>
+}
