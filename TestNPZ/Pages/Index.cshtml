@@ -8,40 +8,57 @@
     <h1 class="display-4">Добро пожаловать!</h1>
     <p>Моё тестовое приложение для выгрузки данных из БеларусБанка</a>.</p>
 </div>
-@if (Model.ExchangeRates != null && Model.ExchangeRates.Any())
+@if (Model.User.Identity.IsAuthenticated)
 {
-    var firstRow = Model.ExchangeRates.First();
-    <p>
-        @firstRow.name_type @firstRow.name.
-    </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Валюта</th>
-                <th>Покупка</th>
-                <th>Продажа</th>
-                <th>Улица</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var rate in Model.ExchangeRates)
-            {
-                <tr>
-                    <td>USD</td>
-                    <td>@rate.USD_in</td>
-                    <td>@rate.USD_out</td>
-                    <td>@rate.street_type @rate.street</td>
-                </tr>
-                <tr>
-                    <td>EUR</td>
-                    <td>@rate.EUR_in</td>
-                    <td>@rate.EUR_out</td>
-                    <td>@rate.street_type @rate.street</td>
-                </tr>
+@if (Model.ExchangeRates != null && Model.ExchangeRates.Any())
+    {
+        @if (User.IsInRole("Operator"))
+        {
+            <h1 class="display-4">Вы являетесь оператором!</h1>
+
+            <form method="post">
+                <div class="form-group">
+            <label for="amount">Сумма:</label>
+            <input type="number" class="form-control" id="amount" name="amount" required />
+        </div>
+
+        <div class="form-group">
+            <label for="fromCurrency">Из валюты:</label>
+            <select class="form-control" id="fromCurrency" name="fromCurrency">
+                <option value="BYN">BYN</option>
+                <option value="RUB">RUB</option>
+                <option value="GBP">GBP</option>
+                <option value="CAD">CAD</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
                 <!-- Добавь сюда остальные валюты -->
-            }
-        </tbody>
-    </table>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="toCurrency">В валюту:</label>
+            <select class="form-control" id="toCurrency" name="toCurrency">
+                <option value="BYN">BYN</option>
+                <option value="RUB">RUB</option>
+                <option value="GBP">GBP</option>
+                <option value="CAD">CAD</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <!-- Добавь сюда остальные валюты -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="result">Итого: Из @Model.StartAmount @Model.StartCurrency будет @Model.ResultCalc @Model.FinishCurrency </label>
+        </div>
+        <button type="submit" class="btn btn-primary" name="action" value="calculate">Рассчитать</button>
+        <button type="submit" class="btn btn-success" name="action" value="exchange">Обменять</button>
+            </form>
+        }
+        else if(User.IsInRole("Admin"))
+        {
+            <p>ПУМПУМПУМ</p>
+        }
+    }
 }
 else
 {

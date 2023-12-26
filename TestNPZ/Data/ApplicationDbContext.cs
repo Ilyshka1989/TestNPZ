@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TestNPZ.Data.Models;
 
 namespace TestNPZ.Data
 {
@@ -9,5 +11,6 @@ namespace TestNPZ.Data
             : base(options)
         {
         }
+        DbSet<Logging> Loggings { get; set; }
     }
 }
