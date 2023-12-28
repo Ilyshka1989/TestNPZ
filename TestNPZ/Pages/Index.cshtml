@@ -6,7 +6,7 @@
 
 <div class="text-center">
     <h1 class="display-4">Добро пожаловать!</h1>
-    <p>Моё тестовое приложение для выгрузки данных из БеларусБанка</a>.</p>
+    <p>Моё тестовое приложение для выгрузки данных из БеларусБанка.</p>
 </div>
 @if (Model.User.Identity.IsAuthenticated)
 {
@@ -56,7 +56,22 @@
         }
         else if(User.IsInRole("Admin"))
         {
-            <p>ПУМПУМПУМ</p>
+            <h2>Выполненые операции</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Сумма</th>
+                        <th>Из валюты</th>
+                        <th>В валюту</th>
+                        <th>Итого</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                 
+                    </tbody>
+            </table>
+
         }
     }
 }

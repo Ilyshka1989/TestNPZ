@@ -10,6 +10,7 @@ using TestNPZ.Data;
 using TestNPZ.Data.Models;
 using static System.Net.WebRequestMethods;
 
+
 namespace TestNPZ.Pages
 {
     public class IndexModel : PageModel
@@ -33,7 +34,7 @@ namespace TestNPZ.Pages
         {
             if (action == "calculate")
             {
-                var amount = double.Parse(Request.Form["amount"]);
+                var amount = decimal.Parse(Request.Form["amount"]);
                 var fromCurrency = Request.Form["fromCurrency"];
                 var toCurrency = Request.Form["toCurrency"];
                 OnPostCalculate(amount, fromCurrency, toCurrency);
@@ -86,12 +87,12 @@ namespace TestNPZ.Pages
 
             return result;
         }
-        public async Task<IActionResult> OnPostCalculate(double amount, string fromCurrency, string toCurrency)
+        public async Task<IActionResult> OnPostCalculate(decimal amount, string fromCurrency, string toCurrency)
         {
             var exch = 1.0;
             StartCurrency = fromCurrency;
             FinishCurrency = toCurrency;
-            StartAmount = amount;
+            StartAmount = Convert.ToDouble(amount); 
             var exchangeRatesData = HttpContext.Session.GetString("ExchangeRates");
             if (!string.IsNullOrEmpty(exchangeRatesData))
             {
@@ -113,7 +114,7 @@ namespace TestNPZ.Pages
                         exch = Convert.ToDouble(getRateEUR?.EUR_out);
                         break;
                 }
-                ResultCalc = Math.Round(amount / exch, 2);
+                ResultCalc = Math.Round(Convert.ToDouble(amount) / exch, 2);
             }
             else
             {
@@ -130,7 +131,7 @@ namespace TestNPZ.Pages
                         exch = Convert.ToDouble(getRateEUR?.EUR_in);
                         break;
                 }
-                ResultCalc = Math.Round(amount * exch, 2);
+                ResultCalc = Math.Round(Convert.ToDouble(amount) * exch, 2);
             }
             return Page();
         }
