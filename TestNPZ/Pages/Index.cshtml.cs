@@ -41,7 +41,11 @@ namespace TestNPZ.Pages
             }
             else if (action == "exchange")
             {
-                // логика обмена
+                var amount = decimal.Parse(Request.Form["amount"]);
+                var fromCurrency = Request.Form["fromCurrency"];
+                var toCurrency = Request.Form["toCurrency"];
+                OnPostCalculate(amount, fromCurrency, toCurrency);
+                OnPostExchange();
             }
         }
         public async Task OnGet()
@@ -107,11 +111,10 @@ namespace TestNPZ.Pages
                         break;
                     case "USD":
                         var getRateUSD = ExchangeRates.FirstOrDefault(x => x.street_type == "ул." && x.street == "Ленинская");
-                        exch = Convert.ToDouble(getRateUSD?.USD_out);
-                        break;
+                        exch = Convert.ToDouble(getRateUSD?.USD_out.Replace('.', ',')); break;
                     case "EUR":
                         var getRateEUR = ExchangeRates.FirstOrDefault(x => x.street_type == "ул." && x.street == "Ленинская");
-                        exch = Convert.ToDouble(getRateEUR?.EUR_out);
+                        exch = Convert.ToDouble(getRateEUR?.EUR_out.Replace('.', ','));
                         break;
                 }
                 ResultCalc = Math.Round(Convert.ToDouble(amount) / exch, 2);
@@ -124,11 +127,11 @@ namespace TestNPZ.Pages
                         break;
                     case "USD":
                         var getRateUSD = ExchangeRates.FirstOrDefault(x => x.street_type == "ул." && x.street == "Ленинская");
-                        exch = Convert.ToDouble(getRateUSD?.USD_in);
-                        break;
+                        exch = Convert.ToDouble(getRateUSD?.USD_in.Replace('.', ',')); break;
                     case "EUR":
                         var getRateEUR = ExchangeRates.FirstOrDefault(x => x.street_type == "ул." && x.street == "Ленинская");
-                        exch = Convert.ToDouble(getRateEUR?.EUR_in);
+                        exch = Convert.ToDouble(getRateEUR?.EUR_in.Replace('.', ','));
+
                         break;
                 }
                 ResultCalc = Math.Round(Convert.ToDouble(amount) * exch, 2);

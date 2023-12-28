@@ -52,6 +52,7 @@
         </div>
         <button type="submit" class="btn btn-primary" name="action" value="calculate">Рассчитать</button>
         <button type="submit" class="btn btn-success" name="action" value="exchange">Обменять</button>
+                <button type="submit" class="btn btn-success" name="action" value="save">Сохранить</button>
             </form>
         }
         else if(User.IsInRole("Admin"))
@@ -68,8 +69,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                 
-                    </tbody>
+                 @foreach(var item in Model.ExchangeRates )
+                 {
+                     <tr>
+                         <th>@item.</th>
+                            <th>@item.</th>
+                            <th>@item.</th>
+                            <th>@item.</th>
+                            <th>@item.</th>
+                         
+                     </tr>
+                        
+                    }
+                </tbody>
             </table>
 
         }
