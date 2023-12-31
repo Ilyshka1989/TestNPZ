@@ -61,22 +61,18 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Сумма</th>
-                        <th>Из валюты</th>
-                        <th>В валюту</th>
-                        <th>Итого</th>
+                        <th>Пользователь</th>
+                        <th>Операция</th>
                         <th>Дата</th>
                     </tr>
                 </thead>
                 <tbody>
-                 @foreach(var item in Model.ExchangeRates )
+                    @foreach (var item in Model.LoggingsA)
                  {
                      <tr>
-                         <th>@item.</th>
-                            <th>@item.</th>
-                            <th>@item.</th>
-                            <th>@item.</th>
-                            <th>@item.</th>
+                            <th>@item.UserName</th>
+                            <th>@item.RowMessage</th>
+                            <th>@item.CreatedDate</th>
                          
                      </tr>
                         

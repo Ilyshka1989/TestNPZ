@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
@@ -17,18 +19,20 @@ namespace TestNPZ.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly HttpClient _httpClient;
-        private readonly ApplicationDbContext _context;
-
+        private readonly IServiceProvider _serviceProvider;
         public List<ExchangeBB> ExchangeRates { get; set; }
         public double ResultCalc { get; set; }
         public double StartAmount { get; set; }
         public string StartCurrency { get; set; }
         public string FinishCurrency { get; set; }
-        public IndexModel(ILogger<IndexModel> logger, HttpClient httpClient, ApplicationDbContext context)
+
+        public List<Logging> LoggingsA { get; set; }
+        
+        public IndexModel(ILogger<IndexModel> logger, HttpClient httpClient, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _httpClient = httpClient;
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
         public void OnPost(string action)
         {
@@ -56,15 +60,35 @@ namespace TestNPZ.Pages
             {
                 // Десериализация данных из сессии
                 ExchangeRates = JsonConvert.DeserializeObject<List<ExchangeBB>>(exchangeRatesData);
+                LoggingsA = await GetAsyncLog();
             }
             else
             {
                 // Если в сессии нет данных, загрузите их и сохраните в сессию
+                LoggingsA = await GetAsyncLog();
                 ExchangeRates = await GetExchangeAsync("Мозырь");
+                
                 HttpContext.Session.SetString("ExchangeRates", JsonConvert.SerializeObject(ExchangeRates));
             }
         }
-
+        public bool CheckDate(DateTime d1, DateTime d2)
+        {
+            return new DateTime(d1.Year, d1.Month, d1.Day) == new DateTime(d2.Year, d2.Month, d2.Day);
+        }
+        public async Task<List<Logging>> GetAsyncLog() 
+        {
+            var result = new List<Logging>();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var contextOptions = scope.ServiceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>();
+                using (var context = new ApplicationDbContext(contextOptions))
+                {
+                    result = await context.Loggings.Where(x => x.Id > 0).ToListAsync();
+                }
+                
+            }
+            return result;
+        }
         public async Task<List<ExchangeBB>> GetExchangeAsync(string city = "Минск")
         {
             var result = new List<ExchangeBB>();
@@ -91,7 +115,7 @@ namespace TestNPZ.Pages
 
             return result;
         }
-        public async Task<IActionResult> OnPostCalculate(decimal amount, string fromCurrency, string toCurrency)
+        public async void OnPostCalculate(decimal amount, string fromCurrency, string toCurrency)
         {
             var exch = 1.0;
             StartCurrency = fromCurrency;
@@ -136,18 +160,23 @@ namespace TestNPZ.Pages
                 }
                 ResultCalc = Math.Round(Convert.ToDouble(amount) * exch, 2);
             }
-            return Page();
         }
-
-        public IActionResult OnPostExchange(decimal amount, string fromCurrency, string toCurrency)
+        public async void OnPostExchange()
         {
-            // Логика для выполнения обмена валюты
-            // Это может включать обновление базы данных, учета и т.д.
-
-            // После выполнения обмена, очистите форму
-            ModelState.Clear();
-
-            return RedirectToPage();
+            var userName = User.Identity.Name == null ? "" : User.Identity.Name;
+            var log = new Logging();
+            log.CreatedDate = DateTime.Now;
+            log.UserName = userName;
+            log.RowMessage = " Оператор " + userName + " произвел обмен " + StartAmount + " в " + FinishCurrency + " на сумму " +  ResultCalc;
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var contextOptions = scope.ServiceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>();
+                using (var context = new ApplicationDbContext(contextOptions))
+                {
+                    context.Loggings.Add(log);
+                    await context.SaveChangesAsync();
+                }
+            }
         }
     }
 }

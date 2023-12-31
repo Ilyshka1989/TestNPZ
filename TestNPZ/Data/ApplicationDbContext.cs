@@ -11,6 +11,6 @@ namespace TestNPZ.Data
             : base(options)
         {
         }
-        DbSet<Logging> Loggings { get; set; }
+        public DbSet <Logging>  Loggings { get; set; }
     }
 }
